@@ -1,0 +1,13 @@
+package org.yascode.inventory_saas;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class InventorySaasApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(InventorySaasApplication.class, args);
+	}
+
+}
