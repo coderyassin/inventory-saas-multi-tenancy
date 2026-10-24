@@ -1,0 +1,48 @@
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: saas-db
+
+    environment:
+      POSTGRES_DB: ${DB_NAME:-inventory-saas_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    ports:
+      - "${DB_PORT:-5432}:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - saas-app-network
+
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  saas-app-network:
+    driver: bridge
