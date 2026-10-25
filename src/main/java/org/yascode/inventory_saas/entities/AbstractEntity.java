@@ -36,7 +36,7 @@ import static jakarta.persistence.GenerationType.UUID;
 public class AbstractEntity {
 
     @Id
-    @GeneratedValue(strategy = UUID)
+    //@GeneratedValue(strategy = UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private String id;
 
@@ -64,6 +64,9 @@ public class AbstractEntity {
 
     @PrePersist
     protected void onCreate() {
+        if (this.id == null) {
+            this.id = java.util.UUID.randomUUID().toString();
+        }
         if (this.deleted == null) {
             this.deleted = Boolean.FALSE;
         }
@@ -73,7 +76,11 @@ public class AbstractEntity {
         }
 
         if (this.tenantId == null) {
-            this.tenantId = TenantContext.getCurrentTenant();
+            this.tenantId = resolveTenantId();
         }
+    }
+
+    protected String resolveTenantId() {
+        return TenantContext.getCurrentTenant();
     }
 }

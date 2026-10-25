@@ -31,6 +31,15 @@ import static jakarta.persistence.EnumType.STRING;
 )
 public class User extends AbstractEntity implements UserDetails {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "tenant_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(name = "fk_user_tenant_id")
+    )
+    private Tenant tenant;
+
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 

@@ -1,0 +1,1 @@
+ALTER TABLE tenants ADD CONSTRAINT chk_tenants_tenant_id_eq_id CHECK (tenant_id = id);
