@@ -17,7 +17,12 @@ import static jakarta.persistence.EnumType.STRING;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "stock_mvts")
+@Table(
+        name = "stock_mvts",
+        indexes = {
+                @Index(name = "idx_stock_mvts_tenant_id", columnList = "tenant_id")
+        }
+)
 public class StockMvt extends AbstractEntity {
 
     @Column(name = "type_mvt", nullable = false)

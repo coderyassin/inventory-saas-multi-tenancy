@@ -23,8 +23,8 @@ import java.io.IOException;
  */
 
 
-@Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+//@Component
+//@Order(Ordered.HIGHEST_PRECEDENCE)
 public class TenantFilter implements Filter {
 
     private static final String TENANT_HEADER = "X-Tenant-ID";

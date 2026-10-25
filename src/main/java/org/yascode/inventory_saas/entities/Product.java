@@ -16,7 +16,12 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "products")
+@Table(
+        name = "products",
+        indexes = {
+                @Index(name = "idx_products_tenant_id", columnList = "tenant_id")
+        }
+)
 public class Product extends AbstractEntity {
 
     @Column(name = "name", nullable = false)
