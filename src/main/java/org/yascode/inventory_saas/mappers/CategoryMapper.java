@@ -12,7 +12,6 @@ public class CategoryMapper {
         return Category.builder()
                        .name(request.getName())
                        .description(request.getDescription())
-                       .createdBy("admin") // TODO: Get current user
                        .deleted(false)
                        .build();
     }

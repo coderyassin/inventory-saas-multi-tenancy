@@ -19,7 +19,6 @@ public class ProductMapper {
                       .category(Category.builder()
                                         .id(request.getCategoryId())
                                         .build())
-                      .createdBy("admin") // TODO: Get current user
                       .deleted(false)
                       .build();
     }

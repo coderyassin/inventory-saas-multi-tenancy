@@ -18,7 +18,6 @@ public class StockMvtMapper {
                        .product(Product.builder()
                                        .id(request.getProductId())
                                        .build())
-                .createdBy("admin") // TODO: Get current user
                 .deleted(false)
                        .build();
     }

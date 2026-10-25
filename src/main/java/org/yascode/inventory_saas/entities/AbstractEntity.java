@@ -6,11 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.yascode.inventory_saas.config.TenantContext;
 
 import java.time.LocalDateTime;
 
@@ -23,12 +27,21 @@ import static jakarta.persistence.GenerationType.UUID;
 @NoArgsConstructor
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@FilterDef(
+        name = "tenantFilter",
+        parameters = @ParamDef(name = "tenantId", type = String.class),
+        defaultCondition = "tenant_id = :tenantId"
+)
+@Filter(name = "tenantFilter")
 public class AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private String id;
+
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
@@ -52,7 +65,15 @@ public class AbstractEntity {
     @PrePersist
     protected void onCreate() {
         if (this.deleted == null) {
-            this.deleted = false;
+            this.deleted = Boolean.FALSE;
+        }
+        // todo: this has to be deleted once security is implemented
+        if (this.createdBy == null) {
+            this.createdBy = "SYSTEM";
+        }
+
+        if (this.tenantId == null) {
+            this.tenantId = TenantContext.getCurrentTenant();
         }
     }
 }
