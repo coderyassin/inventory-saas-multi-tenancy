@@ -1,5 +1,7 @@
 package org.yascode.inventory_saas.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.yascode.inventory_saas.entities.User;
@@ -16,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByUsername(String adminUsername);
 
     boolean existsByEmail(String email);
+
+    @Query("SELECT u FROM User u WHERE u.tenant.id = :tenantId AND u.deleted = false")
+    Page<User> findAllByTenantId(String tenantId, Pageable pageable);
 }

@@ -136,7 +136,7 @@ public class TenantServiceImpl implements TenantService {
                                    .email(tenant.getAdminEmail())
                                    .firstName(extractFirstName(tenant.getAdminFullName()))
                                    .lastName(extractLastName(tenant.getAdminFullName()))
-                                   .password(this.passwordEncoder.encode(tenant.getAdminPassword()))
+                                   .password(tenant.getAdminPassword())
                                    .role(UserRole.ROLE_COMPANY_ADMIN)
                                    .tenant(tenant)
                                    .tenantId(tenant.getId())

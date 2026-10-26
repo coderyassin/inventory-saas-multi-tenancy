@@ -50,6 +50,8 @@ public class UserServiceImpl implements UserService {
             throw new InvalidRequestException("Role is required");
         }
 
+        // encode password
+        request.setPassword(this.passwordEncoder.encode(request.getPassword()));
         final User user = this.userMapper.toEntity(request);
 
         this.repository.save(user);
@@ -59,34 +61,113 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(final String userId, final UserRequest request) {
-        // TODO implement updateUser
+        final String tenantId = TenantContext.getCurrentTenant();
+        log.info("Updating user for tenant: {}", tenantId);
+
+        final User user = this.repository.findByIdAndNotDeleted(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+        // check if user belongs to the tenant
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+
+        // check if username is being changed and if it is already taken
+        if (!user.getUsername().equals(request.getUsername()) && this.repository.existsByUsername(request.getUsername())) {
+            throw new DuplicateResourceException("Username already exists");
+        }
+
+        // check if email is being changed and if it is already taken
+        if (!user.getEmail().equals(request.getEmail()) && this.repository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        // validate role (cannot be PLATFORM_ADMIN)
+        if (request.getRole() == UserRole.ROLE_PLATFORM_ADMIN) {
+            throw new InvalidRequestException("Role is required");
+        }
+
+        // update user details
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setRole(request.getRole());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        this.repository.save(user);
+        log.info("User updated successfully");
     }
 
     @Override
     public void deleteUser(final String userId) {
-        // TODO implement deleteUser
+        final String tenantId = TenantContext.getCurrentTenant();
+        log.info("Deleting user for tenant: {}", tenantId);
+
+        final User user = this.repository.findByIdAndNotDeleted(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+        // check if user belongs to the tenant
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+
+        // soft delete user
+        user.setDeleted(true);
+        this.repository.save(user);
+        log.info("User deleted successfully");
     }
 
     @Override
     public UserResponse getUserById(final String userId) {
-        // TODO implement getUserById
-        return null;
+        final String tenantId = TenantContext.getCurrentTenant();
+        final User user = this.repository.findByIdAndNotDeleted(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+        // check if user belongs to the tenant
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+        return this.userMapper.toResponse(user);
     }
 
     @Override
     public PageResponse<UserResponse> getAllUsers(final int page, final int size) {
-        // TODO implement getAllUsers
-        return null;
+        final String tenantId = TenantContext.getCurrentTenant();
+        final PageRequest pageRequest = PageRequest.of(page, size);
+        final Page<User> userPage = this.repository.findAllByTenantId(tenantId, pageRequest);
+        final Page<UserResponse> userResponses = userPage.map(this.userMapper::toResponse);
+        return PageResponse.of(userResponses);
     }
 
     @Override
     public void enableUser(final String userId) {
-        // TODO implement enableUser
+        final String tenantId = TenantContext.getCurrentTenant();
+        final User user = this.repository.findByIdAndNotDeleted(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+        // check if user belongs to the tenant
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+
+        user.setEnabled(true);
+        this.repository.save(user);
+        log.info("User enabled successfully");
     }
 
     @Override
     public void disableUser(final String userId) {
-        // TODO implement disableUser
+        final String tenantId = TenantContext.getCurrentTenant();
+        final User user = this.repository.findByIdAndNotDeleted(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+        // check if user belongs to the tenant
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+
+        user.setEnabled(false);
+        this.repository.save(user);
+        log.info("User disabled successfully");
     }
 
     @Override
