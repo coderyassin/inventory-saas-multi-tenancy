@@ -66,4 +66,11 @@ public class User extends AbstractEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
+
+    public String getTenantId() {
+        if (this.tenant != null) {
+            return this.tenant.getId();
+        }
+        return null;
+    }
 }

@@ -20,6 +20,7 @@ import org.yascode.inventory_saas.repositories.TenantRepository;
 import org.yascode.inventory_saas.repositories.UserRepository;
 import org.yascode.inventory_saas.requests.RegisterTenantRequest;
 import org.yascode.inventory_saas.responses.TenantResponse;
+import org.yascode.inventory_saas.services.ProvisioningService;
 import org.yascode.inventory_saas.services.TenantService;
 
 @Service
@@ -31,6 +32,7 @@ public class TenantServiceImpl implements TenantService {
     private final TenantMapper tenantMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final ProvisioningService provisioningService;
 
     @Override
     @Transactional
@@ -65,6 +67,8 @@ public class TenantServiceImpl implements TenantService {
         this.tenantRepository.save(tenant);
 
         try {
+            // provision the schema for the tenant
+            this.provisioningService.provisionTenant(tenant);
             // create initial admin user
             createInitiaAdminUser(tenant);
         } catch (final Exception e) {
@@ -132,16 +136,15 @@ public class TenantServiceImpl implements TenantService {
         }
 
         final User adminUser = User.builder()
-                                   .username(tenant.getAdminUsername())
-                                   .email(tenant.getAdminEmail())
-                                   .firstName(extractFirstName(tenant.getAdminFullName()))
-                                   .lastName(extractLastName(tenant.getAdminFullName()))
-                                   .password(tenant.getAdminPassword())
-                                   .role(UserRole.ROLE_COMPANY_ADMIN)
-                                   .tenant(tenant)
-                                   .tenantId(tenant.getId())
-                                   .enabled(true)
-                                   .build();
+                .username(tenant.getAdminUsername())
+                .email(tenant.getAdminEmail())
+                .firstName(extractFirstName(tenant.getAdminFullName()))
+                .lastName(extractLastName(tenant.getAdminFullName()))
+                .password(tenant.getAdminPassword())
+                .role(UserRole.ROLE_COMPANY_ADMIN)
+                .tenant(tenant)
+                .enabled(true)
+                .build();
         this.userRepository.save(adminUser);
         log.info("Created initial admin user for tenant {}", tenant.getId());
     }

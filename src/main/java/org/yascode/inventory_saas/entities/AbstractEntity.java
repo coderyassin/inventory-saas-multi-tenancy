@@ -36,12 +36,9 @@ import static jakarta.persistence.GenerationType.UUID;
 public class AbstractEntity {
 
     @Id
-    //@GeneratedValue(strategy = UUID)
+    @GeneratedValue(strategy = UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private String id;
-
-    @Column(name = "tenant_id", nullable = false)
-    private String tenantId;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
@@ -64,19 +61,12 @@ public class AbstractEntity {
 
     @PrePersist
     protected void onCreate() {
-        if (this.id == null) {
-            this.id = java.util.UUID.randomUUID().toString();
-        }
         if (this.deleted == null) {
             this.deleted = Boolean.FALSE;
         }
         // todo: this has to be deleted once security is implemented
         if (this.createdBy == null) {
             this.createdBy = "SYSTEM";
-        }
-
-        if (this.tenantId == null) {
-            this.tenantId = resolveTenantId();
         }
     }
 
