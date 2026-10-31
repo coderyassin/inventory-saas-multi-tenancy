@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.yascode.inventory_saas.config.TenantContext;
+import org.yascode.inventory_saas.config.TenantSchemaResolver;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import java.util.Collections;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
+    private final TenantSchemaResolver tenantSchemaResolver;
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request,
@@ -43,8 +45,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 final String role = this.jwtTokenService.getRoleFromToken(jwt);
 
                 if (tenantId != null) {
-                    // Store the tenant ID
+                    //  Store the tenant ID and schema in the TenantContext
                     TenantContext.setCurrentTenant(tenantId);
+                    final String schemaName = this.tenantSchemaResolver.resolveTenantSchema(tenantId);
+                    TenantContext.setCurrentSchema(schemaName);
                 }
 
                 // Create authentication token
