@@ -18,6 +18,7 @@ import static jakarta.persistence.EnumType.STRING;
 @SuperBuilder
 @Entity
 @Table(
+        schema = "public",
         name = "tenants",
         indexes = {
                 @Index(name = "idx_tenants_tenant_id", columnList = "tenant_id")

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.yascode.inventory_saas.common.PageResponse;
 import org.yascode.inventory_saas.config.TenantContext;
+import org.yascode.inventory_saas.entities.Tenant;
 import org.yascode.inventory_saas.entities.User;
 import org.yascode.inventory_saas.entities.UserRole;
 import org.yascode.inventory_saas.exceptions.DuplicateResourceException;
@@ -51,8 +52,9 @@ public class UserServiceImpl implements UserService {
         }
 
         // encode password
-        request.setPassword(this.passwordEncoder.encode(request.getPassword()));
         final User user = this.userMapper.toEntity(request);
+        user.setPassword(this.passwordEncoder.encode(request.getPassword()));
+        user.setTenant(Tenant.builder().id(tenantId).build());
 
         this.repository.save(user);
 

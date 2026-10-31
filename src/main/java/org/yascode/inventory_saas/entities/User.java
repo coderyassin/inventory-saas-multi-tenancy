@@ -22,6 +22,7 @@ import static jakarta.persistence.EnumType.STRING;
 @SuperBuilder
 @Entity
 @Table(
+        schema = "public",
         name = "users",
         indexes = {
                 @Index(name = "idx_users_tenant_id", columnList = "tenant_id"),
