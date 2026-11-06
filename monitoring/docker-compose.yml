@@ -44,7 +44,7 @@ services:
       - --server.http.listen-addr=0.0.0.0:12345
     volumes:
       - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
-      - ../logs:/var/log/inventory-saas:ro
+      - /opt/inventory-saas/logs:/var/log/inventory:ro
     depends_on:
       - loki
     restart: unless-stopped
