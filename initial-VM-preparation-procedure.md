@@ -85,19 +85,31 @@ Add the following configuration:
 ```ini
 [Unit]
 Description=Inventory SaaS Spring Boot Application
-After=network.target
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 Type=simple
 User=inventory
 Group=inventory
-
 WorkingDirectory=/opt/inventory-saas
+Environment="JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64"
+Environment="OTEL_SERVICE_NAME=inventory-saas"
+Environment="OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318"
+Environment="OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf"
+Environment="OTEL_TRACES_EXPORTER=otlp"
+Environment="OTEL_TRACES_SAMPLER=parentbased_traceidratio"
+Environment="OTEL_TRACES_SAMPLER_ARG=1.0"
+
+# --- Addition to capture SQL queries ---
+Environment="OTEL_INSTRUMENTATION_JDBC_ENABLED=true"
+#Environment="OTEL_INSTRUMENTATION_JDBC_STATEMENT_SANITIZER_ENABLED=true"
+# Optional: to view the settings (use with caution)
+Environment="OTEL_INSTRUMENTATION_COMMON_DB_STATEMENT_SANITIZER_ENABLED=false"
+Environment="OTEL_INSTRUMENTATION_JDBC_EXPERIMENTAL_CAPTURE_QUERY_PARAMETERS=true"
 
 EnvironmentFile=/opt/inventory-saas/.env.spring
-
-ExecStart=/usr/bin/java -jar /opt/inventory-saas/inventory-saas.jar
-
+ExecStart=/usr/lib/jvm/java-25-openjdk-amd64/bin/java -javaagent:/opt/inventory-saas/opentelemetry-javaagent.jar -jar /opt/inventory-saas/inventory-saas-0.0.1-SNAPSHOT.jar
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10
