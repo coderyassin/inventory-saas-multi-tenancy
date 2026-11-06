@@ -1,6 +1,6 @@
 local.file_match "inventory_logs" {
   path_targets = [{
-    __path__ = "/var/log/inventory-saas/*.log",
+    __path__ = "/var/log/inventory/*.log",
     job      = "inventory-saas",
     app      = "inventory-saas",
     env      = "dev",
