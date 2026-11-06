@@ -1,0 +1,59 @@
+<configuration>
+
+    <property name="LOG_PATH"
+              value="${LOG_PATH:-./opt/inventory-saas/logs}"/>
+
+    <property name="APP_NAME"
+              value="inventory-saas"/>
+
+    <appender name="CONSOLE"
+              class="ch.qos.logback.core.ConsoleAppender">
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS}
+                [%thread] %-5level
+                [%X{traceId}]
+                [%X{tenantId}]
+                %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>${LOG_PATH}/application.log</file>
+
+        <rollingPolicy class=
+                               "ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+
+            <fileNamePattern>
+                ${LOG_PATH}/archive/application-%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+
+            <maxFileSize>20MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS}
+                [%thread] %-5level
+                [%X{traceId}]
+                [%X{tenantId}]
+                %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="org.yascode" level="DEBUG"/>
+
+</configuration>

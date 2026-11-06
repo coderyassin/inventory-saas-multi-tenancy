@@ -71,6 +71,31 @@ springdoc:
     operations-sorter: true
     tags-sorter: alpha
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+          - metrics
+
+  endpoint:
+    health:
+      show-details: when_authorized
+
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: ${APP_ENV:dev}
+
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 100ms, 300ms, 500ms, 1s, 2s
+
 # Logging Configuration
 logging:
   file:
