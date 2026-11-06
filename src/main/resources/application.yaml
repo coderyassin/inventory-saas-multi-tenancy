@@ -98,6 +98,8 @@ management:
 
 # Logging Configuration
 logging:
+  pattern:
+    level: "correlationId=%X{correlationId} trace_id=%mdc{trace_id} span_id=%mdc{span_id} %5p"
   file:
     name: ${LOG_FILE_NAME:/opt/inventory-saas/logs/application.log}
   logback:
