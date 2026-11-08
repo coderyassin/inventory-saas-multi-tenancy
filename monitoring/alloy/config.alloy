@@ -1,3 +1,7 @@
+// ==========================================
+// INVENTORY SAAS
+// ==========================================
+
 local.file_match "inventory_logs" {
   path_targets = [{
     __path__ = "/var/log/inventory/*.log",
@@ -11,6 +15,28 @@ loki.source.file "inventory_logs" {
   targets    = local.file_match.inventory_logs.targets
   forward_to = [loki.write.local.receiver]
 }
+
+// ==========================================
+// OBSERVABILITY MY
+// ==========================================
+
+local.file_match "observability_my_logs" {
+  path_targets = [{
+    __path__ = "/var/log/observability-my/*.log",
+    job      = "observability-my",
+    app      = "observability-my",
+    env      = "dev",
+  }]
+}
+
+loki.source.file "observability_my_logs" {
+  targets    = local.file_match.observability_my_logs.targets
+  forward_to = [loki.write.local.receiver]
+}
+
+// ==========================================
+// LOKI OUTPUT
+// ==========================================
 
 loki.write "local" {
   endpoint {

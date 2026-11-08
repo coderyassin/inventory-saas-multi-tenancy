@@ -83,7 +83,11 @@ management:
 
   endpoint:
     health:
-      show-details: when_authorized
+      access: unrestricted
+      show-details: always
+    prometheus:
+      access: unrestricted
+      show-details: always
 
   metrics:
     tags:
