@@ -119,6 +119,9 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
 
 app:
+  analytics:
+    outbox:
+      fixed-delay: 2000
   jwt:
     private-key-path: ${JWT_PRIVATE_KEY_PATH:certs/private_key.pem}
     public-key-path: ${JWT_PUBLIC_KEY_PATH:certs/public_key.pem}

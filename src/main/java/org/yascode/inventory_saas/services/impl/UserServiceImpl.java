@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yascode.inventory_saas.analytics.application.OutboxEventWriter;
 import org.yascode.inventory_saas.common.PageResponse;
 import org.yascode.inventory_saas.config.TenantContext;
 import org.yascode.inventory_saas.entities.Tenant;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private static final String USER_DOES_NOT_EXIST = "User does not exist";
 
     private final ApplicationEventPublisher eventPublisher;
+    private final OutboxEventWriter outboxEventWriter;
     private final UserRepository repository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -67,13 +69,18 @@ public class UserServiceImpl implements UserService {
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
         user.setTenant(Tenant.builder().id(tenantId).build());
 
-        this.repository.save(user);
+        User savedUser = this.repository.save(user);
 
         log.info("User created successfully");
 
         log.info("Publishing user created event for tenant: {}", tenantId);
-        eventPublisher.publishEvent(new UserCreatedEvent(user.getId(), user.getEmail(), user.getCreatedAt()));
+        eventPublisher.publishEvent(new UserCreatedEvent(savedUser.getId(), savedUser.getEmail(), savedUser.getCreatedAt()));
         log.info("User created event published successfully for tenant: {}", tenantId);
+
+        log.info("Publishing outbox event for user: {}", savedUser.getId());
+        outboxEventWriter.publishUserCreated(
+                savedUser.getId()
+        );
     }
 
     @Override
