@@ -71,7 +71,13 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = this.repository.save(user);
 
-        log.info("User created successfully");
+        log.atInfo()
+                .addKeyValue("eventType", "USER_CREATED")
+                .addKeyValue("userId", savedUser.getId())
+                .addKeyValue("application", "inventory-saas")
+                .setMessage("User created: {} successfully")
+                .addArgument(savedUser.getId())
+                .log();
 
         log.info("Publishing user created event for tenant: {}", tenantId);
         eventPublisher.publishEvent(new UserCreatedEvent(savedUser.getId(), savedUser.getEmail(), savedUser.getCreatedAt()));

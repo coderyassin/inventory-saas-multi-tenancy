@@ -1,59 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <!-- ===================== VARIABLES ===================== -->
     <property name="LOG_PATH"
-              value="${LOG_PATH:-./opt/inventory-saas/logs}"/>
+              value="${LOG_PATH:-/opt/inventory-saas/logs}"/>
+
+    <property name="LOG_FILE"
+              value="${LOG_FILE_NAME:-${LOG_PATH}/application.log}"/>
 
     <property name="APP_NAME"
               value="inventory-saas"/>
 
+    <!-- ===================== CONSOLE ===================== -->
     <appender name="CONSOLE"
               class="ch.qos.logback.core.ConsoleAppender">
 
-        <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS}
-                [%thread] %-5level
-                [%X{traceId}]
-                [%X{tenantId}]
-                %logger{36} - %msg%n
-            </pattern>
+        <encoder class="org.springframework.boot.logging.logback.StructuredLogEncoder">
+            <format>${CONSOLE_LOG_STRUCTURED_FORMAT}</format>
+            <charset>UTF-8</charset>
         </encoder>
+
     </appender>
 
+    <!-- ===================== FILE ===================== -->
     <appender name="FILE"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
 
-        <file>${LOG_PATH}/application.log</file>
+        <file>${LOG_FILE}</file>
 
-        <rollingPolicy class=
-                               "ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 
             <fileNamePattern>
                 ${LOG_PATH}/archive/application-%d{yyyy-MM-dd}.%i.log.gz
             </fileNamePattern>
 
-            <maxFileSize>20MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
+            <maxFileSize>${LOG_MAX_FILE_SIZE:-20MB}</maxFileSize>
+            <maxHistory>${LOG_MAX_HISTORY:-30}</maxHistory>
+            <totalSizeCap>${LOG_TOTAL_SIZE_CAP:-1GB}</totalSizeCap>
 
         </rollingPolicy>
 
-        <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS}
-                [%thread] %-5level
-                [%X{traceId}]
-                [%X{tenantId}]
-                %logger{36} - %msg%n
-            </pattern>
+        <encoder class="org.springframework.boot.logging.logback.StructuredLogEncoder">
+            <format>${FILE_LOG_STRUCTURED_FORMAT}</format>
+            <charset>UTF-8</charset>
         </encoder>
+
     </appender>
+
+    <!-- ===================== LEVELS ===================== -->
+    <logger name="org.yascode" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
-
-    <logger name="org.yascode" level="DEBUG"/>
 
 </configuration>
