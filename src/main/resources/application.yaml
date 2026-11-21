@@ -80,6 +80,9 @@ management:
           - info
           - prometheus
           - metrics
+  info:
+    env:
+      enabled: true
 
   endpoint:
     health:
@@ -99,6 +102,11 @@ management:
         http.server.requests: true
       slo:
         http.server.requests: 100ms, 300ms, 500ms, 1s, 2s
+
+info:
+  app:
+    name: "@project.name@"
+    version: "@project.version@"
 
 # Logging Configuration
 logging:
