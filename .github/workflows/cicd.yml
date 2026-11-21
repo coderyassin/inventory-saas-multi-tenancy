@@ -76,7 +76,6 @@ jobs:
           pg_isready -h localhost -p 5432 \
             -U inventory -d inventory_test
 
-
       - name: Run tests
         run: ./mvnw -B clean verify
 
@@ -99,6 +98,9 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
           cache: maven
+
+      - name: Give Maven wrapper permission
+        run: chmod +x mvnw
 
       - name: Package application
         run: |
