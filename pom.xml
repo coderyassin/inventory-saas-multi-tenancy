@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.yascode</groupId>
 	<artifactId>inventory-saas</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>v1.3.0</version>
 	<name/>
 	<description/>
 	<url/>
