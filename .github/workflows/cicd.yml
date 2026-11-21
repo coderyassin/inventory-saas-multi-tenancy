@@ -1,0 +1,89 @@
+name: INVENTORY-SAAS CI/CD
+
+on:
+  push:
+    branches:
+      - feature/multi-tenant-schema-per-tenant
+
+  pull_request:
+    branches:
+      - feature/multi-tenant-schema-per-tenant
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: '25'
+  APP_NAME: inventory-saas
+
+jobs:
+
+  # ==========================================
+  # JOB 1 - CI
+  # ==========================================
+
+  ci:
+    name: CI - Tests and Compilation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4.4.0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4.9.1
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Give Maven wrapper permission
+        run: chmod +x mvnw
+
+      - name: Run tests
+        run: ./mvnw -B clean verify
+
+    # ==========================================
+    # JOB 2 - BUILD
+    # ==========================================
+
+  build:
+    name: Build - Generate JAR
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4.4.0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4.9.1
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Package application
+        run: |
+          ./mvnw -B package -DskipTests
+
+      - name: Prepare artifact
+        run: |
+          JAR=$(find target -maxdepth 1 -type f \
+            -name '*.jar' ! -name '*.jar.original' | head -n 1)
+          
+          test -n "$JAR"
+                    cp "$JAR" inventory-saas.jar
+          
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: inventory-saas-${{ github.sha }}
+          path: inventory-saas.jar
+          retention-days: 7
