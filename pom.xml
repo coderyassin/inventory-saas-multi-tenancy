@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.yascode</groupId>
 	<artifactId>inventory-saas</artifactId>
-	<version>v1.5.0</version>
+	<version>v1.6.0</version>
 	<name>inventory-saas</name>
 	<description/>
 	<url/>
@@ -173,6 +173,20 @@
 								</path>
 							</annotationProcessorPaths>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals><goal>prepare-agent</goal></goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals><goal>report</goal></goals>
 					</execution>
 				</executions>
 			</plugin>
