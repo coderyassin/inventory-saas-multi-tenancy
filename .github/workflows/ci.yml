@@ -171,15 +171,57 @@ jobs:
             -Dsonar.qualitygate.wait=true
 
   # ==========================================
-  # JOB 2 - GITHUB RELEASE
+  # JOB 3 - DEPENDENCY SECURITY SCAN
+  # ==========================================
+  dependency-security:
+    name: Security - OWASP Dependency-Check
+    runs-on: ubuntu-latest
+    needs: [ ci, sonarcloud ]
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v5.1.0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5.7.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Give Maven wrapper permission
+        run: chmod +x mvnw
+
+      - name: Scan Maven dependencies
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          ./mvnw -B --no-transfer-progress \
+            org.owasp:dependency-check-maven:13.0.0:check \
+            -DnvdApiKeyEnvironmentVariable=NVD_API_KEY \
+            -DfailBuildOnCVSS=7.0 \
+            -Dformats=HTML,JSON \
+            -DfailOnError=true
+
+      - name: Upload dependency security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-security-report
+          path: |
+            target/dependency-check-report.html
+            target/dependency-check-report.json
+          if-no-files-found: warn
+          retention-days: 15
+
+  # ==========================================
+  # JOB 4 - GITHUB RELEASE
   # ==========================================
 
   release:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
-    needs:
-      - ci
-      - sonarcloud
+    needs: [ ci, sonarcloud, dependency-security ]
 
     # Only publish when a version tag is pushed
     if: startsWith(github.ref, 'refs/tags/v')
