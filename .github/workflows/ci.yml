@@ -3,14 +3,14 @@ name: INVENTORY-SAAS CI
 on:
   push:
     branches:
-      - feature/multi-tenant-schema-per-tenant
+      - main
 
     tags:
       - 'v*'
 
   pull_request:
     branches:
-      - feature/multi-tenant-schema-per-tenant
+      - main
 
   workflow_dispatch:
 
